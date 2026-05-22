@@ -32,14 +32,14 @@ From within Claude Code:
 /crs-statusline:setup
 ```
 
-The `setup` slash command downloads the script to `~/.claude/claude-statusline.js` and patches `~/.claude/settings.json`. Restart Claude Code afterwards.
+The `setup` slash command downloads the script to `~/.claude/crs-statusline.js` and patches `~/.claude/settings.json`. Restart Claude Code afterwards.
 
 ### Manual
 
 ```bash
 mkdir -p ~/.claude
-curl -fsSL -o ~/.claude/claude-statusline.js \
-  https://raw.githubusercontent.com/zhengyb/Claude-Code-my-statusline/main/statusline.js
+curl -fsSL -o ~/.claude/crs-statusline.js \
+  https://raw.githubusercontent.com/zhengyb/Claude-Code-my-statusline/main/crs-statusline.js
 ```
 
 Then add to `~/.claude/settings.json`:
@@ -48,7 +48,7 @@ Then add to `~/.claude/settings.json`:
 {
   "statusLine": {
     "type": "command",
-    "command": "node ~/.claude/claude-statusline.js"
+    "command": "node ~/.claude/crs-statusline.js"
   }
 }
 ```
@@ -79,13 +79,13 @@ Both are normally already set when you use Claude Code against a relay; this plu
 
 ## How it works
 
-1. Claude Code launches `node ~/.claude/claude-statusline.js` on every statusline render and pipes a JSON blob (session id, model, workspace, cost) to its stdin.
+1. Claude Code launches `node ~/.claude/crs-statusline.js` on every statusline render and pipes a JSON blob (session id, model, workspace, cost) to its stdin.
 2. The script parses stdin to build the top line.
 3. It looks up a 60 s local cache (per `session_id`) under `${tmpdir}/claude-relay-statusline-*.json`. On a cache hit it prints immediately.
 4. On a miss, it `GET`s `{ANTHROPIC_BASE_URL}/v1/session-usage?session={session_id}` with a 2 s timeout, formats the response into the Usage line, and writes the cache.
 5. Any error is swallowed; the script always exits 0 with a sane fallback so the statusline never crashes Claude Code.
 
-The full source is a single file — [`statusline.js`](./statusline.js) — read it before you install.
+The full source is a single file — [`crs-statusline.js`](./crs-statusline.js) — read it before you install.
 
 ## License
 

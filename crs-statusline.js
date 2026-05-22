@@ -11,7 +11,7 @@
  *   {
  *     "statusLine": {
  *       "type": "command",
- *       "command": "node ~/.claude/claude-statusline.js"
+ *       "command": "node ~/.claude/crs-statusline.js"
  *     }
  *   }
  *

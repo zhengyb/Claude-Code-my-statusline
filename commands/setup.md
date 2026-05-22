@@ -23,8 +23,8 @@ Always fetch from the main branch to get the latest version:
 
 ```bash
 mkdir -p ~/.claude
-curl -fsSL -o ~/.claude/claude-statusline.js \
-  https://raw.githubusercontent.com/zhengyb/Claude-Code-my-statusline/main/statusline.js
+curl -fsSL -o ~/.claude/crs-statusline.js \
+  https://raw.githubusercontent.com/zhengyb/Claude-Code-my-statusline/main/crs-statusline.js
 ```
 
 ## Step 3: Configure statusline
@@ -35,7 +35,7 @@ or update the `statusLine` key:
 ```json
 "statusLine": {
   "type": "command",
-  "command": "node ~/.claude/claude-statusline.js"
+  "command": "node ~/.claude/crs-statusline.js"
 }
 ```
 
@@ -64,4 +64,4 @@ Tell the user:
 - Restart Claude Code (or start a new session) to see the statusline.
 - To update later: run `/crs-statusline:setup` again.
 - To remove: delete the `statusLine` block from `~/.claude/settings.json` and
-  `~/.claude/claude-statusline.js`.
+  `~/.claude/crs-statusline.js`.
