@@ -1,30 +1,32 @@
 # crs-statusline
 
-A two-line [Claude Code](https://docs.anthropic.com/en/docs/claude-code) statusline for users of [Claude Relay Service](https://github.com/zhengyb/claude-relay-service). Shows your local session info on top, and the upstream Claude account's OAuth quota plus your daily cost below.
+[English](./README.en.md)
+
+一个供 [Claude Relay Service](https://github.com/zhengyb/claude-relay-service) 用户使用的 [Claude Code](https://docs.anthropic.com/en/docs/claude-code) 双行状态栏插件。第一行显示本地会话信息,第二行显示上游 Claude 账号的 OAuth 配额与你的 API Key 当日费用。
 
 ```
 Sonnet · my-project · $0.35 · 12m12s
 Upstream Usage: 5h 16% (3h29m), 7d 43% (3d), sonnet 21% (3d); My Daily Usage: $14.85/$200
 ```
 
-- **Top line** — from Claude Code's stdin JSON, recomputed on every render:
-  - `model.display_name` · `workspace.current_dir` (basename) · `$cost.total_cost_usd` · `cost.total_duration_ms`
-  - Any field missing is silently skipped; if all four are missing, the top line is omitted.
-- **Bottom line** — from the relay's `/v1/session-usage` endpoint, cached locally for 60 s:
-  - **Upstream Usage**: 5h / 7d / sonnet OAuth windows with utilization % and reset countdowns (data comes from `api.anthropic.com/api/oauth/usage` via the relay)
-  - **My Daily Usage**: today's rated cost vs the API Key's daily limit (`$NA` when no limit set)
+- **顶部行** —— 取自 Claude Code 注入到 statusline 脚本 stdin 的 JSON,每次渲染实时计算:
+  - `model.display_name` · `workspace.current_dir`(只取末级目录名) · `$cost.total_cost_usd` · `cost.total_duration_ms`(自动格式化为 `Xs` / `XmYs` / `XhYm`)
+  - 任一字段缺失时跳过该段;四个全缺则不输出顶部行。
+- **底部行** —— 取自 relay 端 `/v1/session-usage` 端点,本地缓存 60 秒:
+  - **Upstream Usage**:当前上游 Claude 账号的 5h / 7d / sonnet 三个 OAuth 窗口利用率与重置剩余时间(数据由 relay 转发自 `api.anthropic.com/api/oauth/usage`)
+  - **My Daily Usage**:当日(按倍率计算)费用 / API Key 的日限额(`$NA` 表示未设限额)
 
-## Requirements
+## 依赖
 
 - Claude Code 2.1+
-- Node.js 18+ (zero npm deps; uses only Node built-ins)
-- A [Claude Relay Service](https://github.com/zhengyb/claude-relay-service) backend with the `/v1/session-usage` endpoint enabled (`STATUSLINE_USAGE_ENABLED=true` in its `.env`)
+- Node.js 18+(零 npm 依赖,只用 Node 内置模块)
+- [Claude Relay Service](https://github.com/zhengyb/claude-relay-service) 后端,且 `/v1/session-usage` 端点已启用(在 relay 的 `.env` 加 `STATUSLINE_USAGE_ENABLED=true` 并重启 relay)
 
-## Install
+## 安装
 
-### Via Claude Code plugin (recommended)
+### 通过 Claude Code 插件(推荐)
 
-From within Claude Code:
+在 Claude Code 里依次执行:
 
 ```
 /plugin marketplace add zhengyb/Claude-Code-my-statusline
@@ -32,9 +34,9 @@ From within Claude Code:
 /crs-statusline:setup
 ```
 
-The `setup` slash command downloads the script to `~/.claude/crs-statusline.js` and patches `~/.claude/settings.json`. Restart Claude Code afterwards.
+`setup` 命令会把脚本下载到 `~/.claude/crs-statusline.js`,并自动改写 `~/.claude/settings.json` 的 `statusLine` 字段。装完后重启 Claude Code 即可。
 
-### Manual
+### 手动安装
 
 ```bash
 mkdir -p ~/.claude
@@ -42,7 +44,7 @@ curl -fsSL -o ~/.claude/crs-statusline.js \
   https://raw.githubusercontent.com/zhengyb/Claude-Code-my-statusline/main/crs-statusline.js
 ```
 
-Then add to `~/.claude/settings.json`:
+然后在 `~/.claude/settings.json` 里加(或更新):
 
 ```json
 {
@@ -53,40 +55,40 @@ Then add to `~/.claude/settings.json`:
 }
 ```
 
-Restart Claude Code.
+重启 Claude Code。
 
-## Environment
+## 环境变量
 
-The statusline inherits the Claude Code process's environment. It needs:
+脚本继承 Claude Code 进程的环境变量,需要:
 
-| Variable | Purpose |
-|----------|---------|
-| `ANTHROPIC_BASE_URL` | Relay base URL with `/api` suffix (e.g. `http://your-relay:3000/api`) |
-| `ANTHROPIC_AUTH_TOKEN` or `ANTHROPIC_API_KEY` | Your `cr_` prefixed API key |
+| 变量 | 用途 |
+|------|------|
+| `ANTHROPIC_BASE_URL` | relay 地址,**须以 `/api` 结尾**(例如 `http://your-relay:3000/api`) |
+| `ANTHROPIC_AUTH_TOKEN` 或 `ANTHROPIC_API_KEY` | 你的 `cr_` 前缀 API Key |
 
-Both are normally already set when you use Claude Code against a relay; this plugin doesn't add anything new.
+通常你在 Claude Code 用 relay 时这两个变量已经设过了,本插件不需要任何额外配置。
 
-## Display states
+## 各种显示状态
 
-| State | Output |
-|-------|--------|
-| All upstream + cost present | `Upstream Usage: 5h 42% (2h13m), 7d 18% (4d), sonnet 9% (4d); My Daily Usage: $1.23/$10` |
-| No daily limit set on the key | `… ; My Daily Usage: $121.10/$NA` |
-| Server returned stale upstream snapshot | `Upstream Usage: ~5h 90% (1m), …` (the `~` prefix) |
-| API Key has no resolvable Claude account | `Upstream Usage: (暂无数据); My Daily Usage: …` |
-| Account exists but isn't Claude OAuth (Setup Token / Console) | `Upstream Usage: (账号无配额数据); …` |
-| Relay unreachable or env vars missing | `Claude —` |
+| 场景 | 输出 |
+|------|------|
+| 上游 + 费用都有 | `Upstream Usage: 5h 42% (2h13m), 7d 18% (4d), sonnet 9% (4d); My Daily Usage: $1.23/$10` |
+| 未设日限额 | `… ; My Daily Usage: $121.10/$NA` |
+| 服务端返回旧快照 | `Upstream Usage: ~5h 90% (1m), …`(`~` 前缀表示数据陈旧) |
+| API Key 没解析到 Claude 账号 | `Upstream Usage: (暂无数据); My Daily Usage: …` |
+| 解析到的账号不是 OAuth(Setup Token / Console) | `Upstream Usage: (账号无配额数据); …` |
+| relay 不可达或环境变量缺失 | `Claude —` |
 
-## How it works
+## 工作原理
 
-1. Claude Code launches `node ~/.claude/crs-statusline.js` on every statusline render and pipes a JSON blob (session id, model, workspace, cost) to its stdin.
-2. The script parses stdin to build the top line.
-3. It looks up a 60 s local cache (per `session_id`) under `${tmpdir}/claude-relay-statusline-*.json`. On a cache hit it prints immediately.
-4. On a miss, it `GET`s `{ANTHROPIC_BASE_URL}/v1/session-usage?session={session_id}` with a 2 s timeout, formats the response into the Usage line, and writes the cache.
-5. Any error is swallowed; the script always exits 0 with a sane fallback so the statusline never crashes Claude Code.
+1. Claude Code 每次刷新状态栏都会启动 `node ~/.claude/crs-statusline.js`,把一段 JSON(`session_id` / model / workspace / cost)喂到脚本 stdin。
+2. 脚本解析 stdin 拼出顶部行。
+3. 查本地缓存(按 `session_id` 分文件,位于 `${tmpdir}/claude-relay-statusline-*.json`),60 秒内命中直接打印。
+4. 缓存未命中则 `GET {ANTHROPIC_BASE_URL}/v1/session-usage?session={session_id}`(超时 2 秒),格式化结果并写缓存。
+5. **任何异常都被吞掉**,脚本永远 `exit 0`、永远输出一行有意义的文本,以保证状态栏永远不会拖垮 Claude Code。
 
-The full source is a single file — [`crs-statusline.js`](./crs-statusline.js) — read it before you install.
+完整源码就一个文件 —— [`crs-statusline.js`](./crs-statusline.js),建议安装前先扫一眼再装。
 
-## License
+## 许可
 
-MIT — see [LICENSE](./LICENSE).
+MIT —— 见 [LICENSE](./LICENSE)。
