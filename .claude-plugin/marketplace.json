@@ -1,0 +1,19 @@
+{
+  "name": "crs-marketplace",
+  "owner": {
+    "name": "zhengyb"
+  },
+  "metadata": {
+    "description": "Statusline plugin for Claude Relay Service users",
+    "version": "0.1.0"
+  },
+  "plugins": [
+    {
+      "name": "crs-statusline",
+      "source": "./",
+      "description": "Two-line statusline: model/cwd/cost/duration plus upstream OAuth quota and daily cost via Claude Relay Service.",
+      "category": "monitoring",
+      "tags": ["statusline", "quota", "claude-relay-service", "oauth-usage", "node"]
+    }
+  ]
+}

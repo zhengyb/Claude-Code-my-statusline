@@ -1,0 +1,27 @@
+{
+  "name": "crs-statusline",
+  "description": "Claude Code statusline for Claude Relay Service users. Renders two lines: model/cwd/cost/duration on top; upstream OAuth quota (5h/7d/sonnet) and daily cost below.",
+  "version": "0.1.0",
+  "author": {
+    "name": "zhengyb",
+    "url": "https://github.com/zhengyb"
+  },
+  "commands": [
+    "./commands/setup.md"
+  ],
+  "homepage": "https://github.com/zhengyb/Claude-Code-my-statusline",
+  "repository": "https://github.com/zhengyb/Claude-Code-my-statusline",
+  "license": "MIT",
+  "keywords": [
+    "claude-code",
+    "claude-code-statusline",
+    "statusline",
+    "status-line",
+    "claude-relay-service",
+    "relay",
+    "oauth-usage",
+    "quota",
+    "monitoring",
+    "node"
+  ]
+}
