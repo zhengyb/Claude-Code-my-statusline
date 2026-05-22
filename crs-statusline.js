@@ -116,7 +116,9 @@ function fetchUsage(baseUrl, apiKey, sessionId) {
   })
 }
 
-// 利用率 → 百分比整数（兼容 0-1 比例与 0-100 两种单位）
+// 利用率 → 百分比整数
+// Anthropic oauth/usage 返回的 utilization 直接就是 0-100 的百分数(例如 1 = 1%, 50 = 50%),
+// 与 admin 用量页 (AccountsView.vue) 的渲染逻辑一致,这里不做单位换算。
 function toPercent(utilization) {
   if (utilization === null || utilization === undefined) {
     return null
@@ -125,7 +127,7 @@ function toPercent(utilization) {
   if (Number.isNaN(n)) {
     return null
   }
-  return Math.round(n <= 1 ? n * 100 : n)
+  return Math.round(n)
 }
 
 // 剩余秒数 → 紧凑文本
