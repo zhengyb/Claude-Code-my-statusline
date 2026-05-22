@@ -12,7 +12,7 @@ Upstream Usage: 5h 16% (3h29m), 7d 43% (3d), sonnet 21% (3d); My Daily Usage: $1
 - **顶部行** —— 取自 Claude Code 注入到 statusline 脚本 stdin 的 JSON,每次渲染实时计算:
   - `model.display_name` · `workspace.current_dir`(只取末级目录名) · `$cost.total_cost_usd` · `cost.total_duration_ms`(自动格式化为 `Xs` / `XmYs` / `XhYm`)
   - 任一字段缺失时跳过该段;四个全缺则不输出顶部行。
-- **底部行** —— 取自 relay 端 `/v1/session-usage` 端点,本地缓存 60 秒:
+- **底部行** —— 取自 relay 端 `/v1/session-usage` 端点,本地缓存 10 秒:
   - **Upstream Usage**:当前上游 Claude 账号的 5h / 7d / sonnet 三个 OAuth 窗口利用率与重置剩余时间(数据由 relay 转发自 `api.anthropic.com/api/oauth/usage`)
   - **My Daily Usage**:当日(按倍率计算)费用 / API Key 的日限额(`$NA` 表示未设限额)
 
@@ -84,7 +84,7 @@ curl -fsSL -o ~/.claude/crs-statusline.js \
 
 1. Claude Code 每次刷新状态栏都会启动 `node ~/.claude/crs-statusline.js`,把一段 JSON(`session_id` / model / workspace / cost)喂到脚本 stdin。
 2. 脚本解析 stdin 拼出顶部行。
-3. 查本地缓存(按 `session_id` 分文件,位于 `${tmpdir}/claude-relay-statusline-*.json`),60 秒内命中直接打印。
+3. 查本地缓存(按 `session_id` 分文件,位于 `${tmpdir}/claude-relay-statusline-*.json`),10 秒内命中直接打印。
 4. 缓存未命中则 `GET {ANTHROPIC_BASE_URL}/v1/session-usage?session={session_id}`(超时 2 秒),格式化结果并写缓存。
 5. **任何异常都被吞掉**,脚本永远 `exit 0`、永远输出一行有意义的文本,以保证状态栏永远不会拖垮 Claude Code。
 

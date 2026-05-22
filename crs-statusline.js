@@ -28,7 +28,7 @@ const path = require('path')
 const http = require('http')
 const https = require('https')
 
-const LOCAL_CACHE_TTL_MS = 60 * 1000
+const LOCAL_CACHE_TTL_MS = 10 * 1000
 const REQUEST_TIMEOUT_MS = 2000
 // 只有当 relay 的域名匹配该列表时才拉取并显示 Usage 行;其他域名只渲染顶部行
 const USAGE_ENABLED_HOSTS = new Set(['us.inhand.com'])

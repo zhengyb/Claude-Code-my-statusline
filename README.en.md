@@ -10,7 +10,7 @@ Upstream Usage: 5h 16% (3h29m), 7d 43% (3d), sonnet 21% (3d); My Daily Usage: $1
 - **Top line** — from Claude Code's stdin JSON, recomputed on every render:
   - `model.display_name` · `workspace.current_dir` (basename) · `$cost.total_cost_usd` · `cost.total_duration_ms`
   - Any field missing is silently skipped; if all four are missing, the top line is omitted.
-- **Bottom line** — from the relay's `/v1/session-usage` endpoint, cached locally for 60 s:
+- **Bottom line** — from the relay's `/v1/session-usage` endpoint, cached locally for 10 s:
   - **Upstream Usage**: 5h / 7d / sonnet OAuth windows with utilization % and reset countdowns (data comes from `api.anthropic.com/api/oauth/usage` via the relay)
   - **My Daily Usage**: today's rated cost vs the API Key's daily limit (`$NA` when no limit set)
 
@@ -84,7 +84,7 @@ Both are normally already set when you use Claude Code against a relay; this plu
 
 1. Claude Code launches `node ~/.claude/crs-statusline.js` on every statusline render and pipes a JSON blob (session id, model, workspace, cost) to its stdin.
 2. The script parses stdin to build the top line.
-3. It looks up a 60 s local cache (per `session_id`) under `${tmpdir}/claude-relay-statusline-*.json`. On a cache hit it prints immediately.
+3. It looks up a 10 s local cache (per `session_id`) under `${tmpdir}/claude-relay-statusline-*.json`. On a cache hit it prints immediately.
 4. On a miss, it `GET`s `{ANTHROPIC_BASE_URL}/v1/session-usage?session={session_id}` with a 2 s timeout, formats the response into the Usage line, and writes the cache.
 5. Any error is swallowed; the script always exits 0 with a sane fallback so the statusline never crashes Claude Code.
 
