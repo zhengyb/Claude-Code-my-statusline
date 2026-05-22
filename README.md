@@ -18,8 +18,8 @@ Upstream Usage: 5h 16% (3h29m), 7d 43% (3d), sonnet 21% (3d); My Daily Usage: $1
 
 ## 依赖
 
+- **Node.js 18+ 和 npm**:必须先在系统全局安装好(脚本本身零 npm 依赖,只用 Node 内置模块,但 Claude Code 启动脚本需要 `node` 命令)。可在终端执行 `node -v && npm -v` 确认。
 - Claude Code 2.1+
-- Node.js 18+(零 npm 依赖,只用 Node 内置模块)
 - [Claude Relay Service](https://github.com/zhengyb/claude-relay-service) 后端,且 `/v1/session-usage` 端点已启用(在 relay 的 `.env` 加 `STATUSLINE_USAGE_ENABLED=true` 并重启 relay)
 
 ## 安装
@@ -31,6 +31,11 @@ Upstream Usage: 5h 16% (3h29m), 7d 43% (3d), sonnet 21% (3d); My Daily Usage: $1
 ```
 /plugin marketplace add zhengyb/Claude-Code-my-statusline
 /plugin install crs-statusline@crs-marketplace
+```
+
+**装完插件后,先执行 `/plugin reload` 让 Claude Code 注册新增的 slash 命令**(否则下一步会报 `Unknown command`)。然后运行:
+
+```
 /crs-statusline:setup
 ```
 

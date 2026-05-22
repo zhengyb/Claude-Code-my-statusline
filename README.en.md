@@ -16,8 +16,8 @@ Upstream Usage: 5h 16% (3h29m), 7d 43% (3d), sonnet 21% (3d); My Daily Usage: $1
 
 ## Requirements
 
+- **Node.js 18+ and npm** must be installed globally on your system first (the script itself has zero npm deps and uses only Node built-ins, but Claude Code invokes it via `node`). Verify with `node -v && npm -v`.
 - Claude Code 2.1+
-- Node.js 18+ (zero npm deps; uses only Node built-ins)
 - A [Claude Relay Service](https://github.com/zhengyb/claude-relay-service) backend with the `/v1/session-usage` endpoint enabled (`STATUSLINE_USAGE_ENABLED=true` in its `.env`)
 
 ## Install
@@ -29,6 +29,11 @@ From within Claude Code:
 ```
 /plugin marketplace add zhengyb/Claude-Code-my-statusline
 /plugin install crs-statusline@crs-marketplace
+```
+
+**After installing, run `/plugin reload` first so Claude Code registers the newly added slash command** (otherwise the next step will fail with `Unknown command`). Then run:
+
+```
 /crs-statusline:setup
 ```
 
