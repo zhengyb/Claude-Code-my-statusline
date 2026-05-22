@@ -30,6 +30,8 @@ const https = require('https')
 
 const LOCAL_CACHE_TTL_MS = 60 * 1000
 const REQUEST_TIMEOUT_MS = 2000
+// 只有当 relay 的域名匹配该列表时才拉取并显示 Usage 行;其他域名只渲染顶部行
+const USAGE_ENABLED_HOSTS = new Set(['us.inhand.com'])
 
 // 读取 stdin（Claude Code 传入的 JSON），失败时返回空对象
 function readStdin() {
@@ -276,6 +278,23 @@ async function main() {
     process.stdout.write(topLine ? `${topLine}\n${usageLine}` : usageLine)
   }
 
+  const baseUrl = (process.env.ANTHROPIC_BASE_URL || '').replace(/\/+$/, '')
+  const apiKey = process.env.ANTHROPIC_AUTH_TOKEN || process.env.ANTHROPIC_API_KEY || ''
+
+  // 域名白名单：非白名单 relay 只渲染顶部行,不发请求、不显示 Usage
+  let host = ''
+  try {
+    host = new URL(baseUrl).hostname.toLowerCase()
+  } catch (_err) {
+    /* baseUrl 解析失败 → host 留空 → 走非白名单分支 */
+  }
+  if (!USAGE_ENABLED_HOSTS.has(host)) {
+    if (topLine) {
+      process.stdout.write(topLine)
+    }
+    return
+  }
+
   // 本地缓存命中（<60s）：直接打印缓存的 Usage 行 + 实时顶部行
   const cache = readCache(file)
   if (cache && Date.now() - cache.ts < LOCAL_CACHE_TTL_MS) {
@@ -283,9 +302,7 @@ async function main() {
     return
   }
 
-  const baseUrl = (process.env.ANTHROPIC_BASE_URL || '').replace(/\/+$/, '')
-  const apiKey = process.env.ANTHROPIC_AUTH_TOKEN || process.env.ANTHROPIC_API_KEY || ''
-  if (!baseUrl || !apiKey) {
+  if (!apiKey) {
     print(cache ? cache.line : 'Claude —')
     return
   }
